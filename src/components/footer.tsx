@@ -6,9 +6,14 @@ export default function Footer() {
       <div className="container flex h-16 items-center justify-center">
         <p className="text-sm text-muted-foreground">
           Built with ❤️ by{' '}
-          <Link href="/about" className="font-medium underline underline-offset-4 hover:text-primary">
-            the developer
-          </Link>
+          <a
+            href="https://developeraliraza.netlify.app/"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="font-medium underline underline-offset-4 hover:text-primary"
+          >
+            Ali Raza
+          </a>
           .
         </p>
       </div>

@@ -20,7 +20,7 @@ export default function AboutPage() {
                 className="rounded-full mx-auto mb-4 border-4 border-primary"
                 data-ai-hint="profile picture"
               />
-              <CardTitle className="font-headline text-3xl">Your Name</CardTitle>
+              <CardTitle className="font-headline text-3xl">Ali Raza</CardTitle>
             </CardHeader>
             <CardContent className="text-center">
               <p className="text-muted-foreground mb-6">
