@@ -3,6 +3,7 @@ import './globals.css';
 import { Toaster } from "@/components/ui/toaster";
 import { ScheduleProvider } from '@/components/providers/ScheduleProvider';
 import { ThemeProvider } from '@/components/providers/ThemeProvider';
+import Footer from '@/components/footer';
 
 export const metadata: Metadata = {
   title: 'CampusClock',
@@ -22,7 +23,7 @@ export default function RootLayout({
         <link href="https://fonts.googleapis.com/css2?family=Inter&display=swap" rel="stylesheet" />
         <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;700&display=swap" rel="stylesheet" />
       </head>
-      <body className="font-body antialiased">
+      <body className="font-body antialiased flex flex-col min-h-screen">
         <ThemeProvider
           attribute="class"
           defaultTheme="dark"
@@ -30,7 +31,10 @@ export default function RootLayout({
           disableTransitionOnChange
         >
           <ScheduleProvider>
-            {children}
+            <div className="flex-grow">
+              {children}
+            </div>
+            <Footer />
           </ScheduleProvider>
           <Toaster />
         </ThemeProvider>

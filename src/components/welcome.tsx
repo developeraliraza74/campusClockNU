@@ -11,7 +11,7 @@ export default function Welcome({ onUploadClick }: WelcomeProps) {
       <div className="bg-primary text-primary-foreground rounded-full p-4 mb-6">
         <UploadCloud className="h-10 w-10" />
       </div>
-      <h1 className="font-headline text-4xl md:text-5xl font-bold tracking-tight">Welcome to ChronoSage</h1>
+      <h1 className="font-headline text-4xl md:text-5xl font-bold tracking-tight">Welcome to CampusClock</h1>
       <p className="mt-4 max-w-2xl text-lg text-muted-foreground">
         Your intelligent assistant for managing class schedules. Get started by uploading a picture of your timetable.
       </p>
