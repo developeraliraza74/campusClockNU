@@ -1,0 +1,111 @@
+"use client";
+import { useEffect, useState } from 'react';
+import { useSchedule } from '@/hooks/use-schedule';
+import { reasoningAlarmScheduler } from '@/ai/flows/reasoning-alarm-scheduler';
+import { consecutiveClassNotification } from '@/ai/flows/consecutive-class-notifications';
+import { useToast } from '@/hooks/use-toast';
+import FullScreenReminder from './full-screen-reminder';
+import type { Class, Schedule } from '@/lib/types';
+import { Switch } from './ui/switch';
+import { Label } from './ui/label';
+import { parse, differenceInMinutes, add, format, getDay } from 'date-fns';
+
+type ActiveReminder = {
+  type: 'alarm' | 'consecutive';
+  classInfo: Class;
+  message: string;
+};
+
+export default function AlarmManager() {
+  const { schedule } = useSchedule();
+  const [activeReminder, setActiveReminder] = useState<ActiveReminder | null>(null);
+  const { toast } = useToast();
+  const [isInsideClass, setIsInsideClass] = useState(false);
+  const [currentTime, setCurrentTime] = useState(new Date());
+
+  useEffect(() => {
+    const timer = setInterval(() => {
+      setCurrentTime(new Date());
+    }, 60000); // Check every minute
+    return () => clearInterval(timer);
+  }, []);
+
+  useEffect(() => {
+    const checkAlarms = async () => {
+      if (activeReminder) return; // Don't check if a reminder is already active
+
+      const dayIndex = getDay(currentTime);
+      const dayOfWeek = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'][dayIndex];
+      const todayClasses = schedule[dayOfWeek as keyof Schedule] || [];
+
+      for (const [index, classInfo] of todayClasses.entries()) {
+        if (!classInfo.alarmEnabled) continue;
+        
+        try {
+          const classStartTime = parse(classInfo.startTime, 'HH:mm', currentTime);
+
+          // Standard alarm logic (11 to 10 minutes before)
+          const minutesToClass = differenceInMinutes(classStartTime, currentTime);
+          if (minutesToClass > 9 && minutesToClass <= 11) {
+            const result = await reasoningAlarmScheduler({
+              className: classInfo.subject,
+              roomNumber: classInfo.roomNumber,
+              startTime: classInfo.startTime,
+              currentTime: format(currentTime, 'HH:mm'),
+              currentLocation: isInsideClass ? 'InsideClass' : 'NotInsideClass',
+            });
+            if (result.shouldSetAlarm && result.alarmTime) {
+              setActiveReminder({ type: 'alarm', classInfo, message: result.reason });
+              break; // Show first alarm and stop checking
+            }
+          }
+
+          // Consecutive class logic (2 minutes before end time of a consecutive class)
+          if (classInfo.isConsecutive) {
+            const classEndTime = add(classStartTime, { minutes: parseInt(classInfo.duration.split(' ')[0]) || 50 });
+            const minutesFromEnd = differenceInMinutes(currentTime, classEndTime);
+            
+            if (minutesFromEnd >= -2 && minutesFromEnd <= 0) {
+              const nextClass = todayClasses[index + 1];
+              if (nextClass) {
+                const result = await consecutiveClassNotification({
+                  isConsecutive: true,
+                  currentClass: { subject: classInfo.subject, room: classInfo.roomNumber, endTime: format(classEndTime, 'p') },
+                  nextClass: { subject: nextClass.subject, room: nextClass.roomNumber, startTime: format(parse(nextClass.startTime, 'HH:mm', new Date()), 'p'), endTime: '' },
+                });
+
+                if (result.notificationType === 'soft_notification') {
+                  toast({ title: 'Next Class', description: result.message });
+                } else if (result.notificationType === 'full_screen_reminder') {
+                  setActiveReminder({ type: 'consecutive', classInfo: nextClass, message: result.message });
+                  break; // Show reminder and stop
+                }
+              }
+            }
+          }
+        } catch (e) {
+          console.error("Error during alarm check:", e);
+          toast({ title: 'AI Error', description: 'Could not process an alarm.', variant: 'destructive'});
+        }
+      }
+    };
+    
+    checkAlarms();
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [currentTime, schedule, isInsideClass]);
+
+  return (
+    <>
+      <div className="fixed bottom-4 right-4 bg-card p-3 rounded-lg border shadow-lg flex items-center space-x-2 z-50">
+        <Switch id="location-mode" checked={isInsideClass} onCheckedChange={setIsInsideClass} />
+        <Label htmlFor="location-mode" className="text-sm font-medium">In a classroom</Label>
+      </div>
+      {activeReminder && (
+        <FullScreenReminder
+          reminder={activeReminder}
+          onDismiss={() => setActiveReminder(null)}
+        />
+      )}
+    </>
+  );
+}
