@@ -21,9 +21,10 @@ export default function AlarmManager() {
   const [activeReminder, setActiveReminder] = useState<ActiveReminder | null>(null);
   const { toast } = useToast();
   const [isInsideClass, setIsInsideClass] = useState(false);
-  const [currentTime, setCurrentTime] = useState(new Date());
+  const [currentTime, setCurrentTime] = useState<Date | null>(null);
 
   useEffect(() => {
+    setCurrentTime(new Date());
     const timer = setInterval(() => {
       setCurrentTime(new Date());
     }, 60000); // Check every minute
@@ -32,7 +33,7 @@ export default function AlarmManager() {
 
   useEffect(() => {
     const checkAlarms = async () => {
-      if (activeReminder) return; // Don't check if a reminder is already active
+      if (!currentTime || activeReminder) return; // Don't check if a reminder is already active
 
       const dayIndex = getDay(currentTime);
       const dayOfWeek = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'][dayIndex];

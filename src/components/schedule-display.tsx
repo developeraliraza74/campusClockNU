@@ -38,6 +38,10 @@ export default function ScheduleDisplay() {
     return null;
   }
 
+  const handleTabChange = (value: string) => {
+    setCurrentDay(value as DayOfWeek);
+  }
+
   return (
     <div className="space-y-6">
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
@@ -60,7 +64,7 @@ export default function ScheduleDisplay() {
           </AlertDialogContent>
         </AlertDialog>
       </div>
-      <Tabs value={currentDay} onValueChange={(value) => setCurrentDay(value as DayOfWeek)} className="w-full">
+      <Tabs value={currentDay} onValueChange={handleTabChange} className="w-full">
         <TabsList className="grid w-full grid-cols-3 md:grid-cols-4 lg:grid-cols-7">
           {ALL_DAYS.map(day => (
             <TabsTrigger key={day} value={day}>{day.substring(0,3)}</TabsTrigger>

@@ -12,6 +12,7 @@ import type { Class } from '@/lib/types';
 import { ALL_DAYS } from '@/lib/types';
 import { useSchedule } from '@/hooks/use-schedule';
 import { useToast } from '@/hooks/use-toast';
+import { useEffect } from 'react';
 
 const classSchema = z.object({
   subject: z.string().min(1, "Subject is required."),
