@@ -2,9 +2,10 @@ import type {Metadata} from 'next';
 import './globals.css';
 import { Toaster } from "@/components/ui/toaster";
 import { ScheduleProvider } from '@/components/providers/ScheduleProvider';
+import { ThemeProvider } from '@/components/providers/ThemeProvider';
 
 export const metadata: Metadata = {
-  title: 'ChronoSage',
+  title: 'CampusClock',
   description: 'Intelligent timetable and alarm management.',
 };
 
@@ -22,10 +23,17 @@ export default function RootLayout({
         <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;700&display=swap" rel="stylesheet" />
       </head>
       <body className="font-body antialiased">
-        <ScheduleProvider>
-          {children}
-        </ScheduleProvider>
-        <Toaster />
+        <ThemeProvider
+          attribute="class"
+          defaultTheme="dark"
+          enableSystem
+          disableTransitionOnChange
+        >
+          <ScheduleProvider>
+            {children}
+          </ScheduleProvider>
+          <Toaster />
+        </ThemeProvider>
       </body>
     </html>
   );

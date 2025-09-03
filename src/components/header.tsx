@@ -1,5 +1,6 @@
 import { Button } from "@/components/ui/button";
 import { UploadCloud, BookOpenCheck } from "lucide-react";
+import { ThemeSwitcher } from "./theme-switcher";
 
 type HeaderProps = {
   onUploadClick: () => void;
@@ -11,12 +12,15 @@ export default function Header({ onUploadClick }: HeaderProps) {
       <div className="container flex h-16 items-center justify-between">
         <div className="flex items-center gap-2">
           <BookOpenCheck className="h-7 w-7 text-primary" />
-          <h1 className="font-headline text-2xl font-bold">ChronoSage</h1>
+          <h1 className="font-headline text-2xl font-bold">CampusClock</h1>
         </div>
-        <Button variant="outline" onClick={onUploadClick}>
-          <UploadCloud className="mr-2 h-4 w-4" />
-          Upload
-        </Button>
+        <div className="flex items-center gap-2">
+          <Button variant="outline" onClick={onUploadClick}>
+            <UploadCloud className="mr-2 h-4 w-4" />
+            Upload
+          </Button>
+          <ThemeSwitcher />
+        </div>
       </div>
     </header>
   );
