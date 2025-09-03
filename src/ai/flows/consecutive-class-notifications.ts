@@ -17,13 +17,13 @@ const ConsecutiveClassNotificationInputSchema = z.object({
     subject: z.string().describe('The subject of the current class.'),
     room: z.string().describe('The room number of the current class.'),
     endTime: z.string().describe('The end time of the current class (e.g., 10:50 AM).'),
-  }).optional(),
+  }),
   nextClass: z.object({
     subject: z.string().describe('The subject of the next class.'),
     room: z.string().describe('The room number of the next class.'),
     startTime: z.string().describe('The start time of the next class (e.g., 11:00 AM).'),
     endTime: z.string().describe('The end time of the next class (e.g., 11:50 AM).'),
-  }).optional(),
+  }),
   isConsecutive: z.boolean().describe('Whether the next class is immediately after the current class.'),
 });
 
@@ -46,14 +46,19 @@ const consecutiveClassNotificationPrompt = ai.definePrompt({
   output: {schema: ConsecutiveClassNotificationOutputSchema},
   prompt: `You are a helpful assistant designed to determine the appropriate notification type for students with consecutive classes.
 
-  Given the details of the current class and the next class, determine whether to display an alarm, a soft notification, a full-screen reminder, or no notification.
+  Your goal is to remind the student about their upcoming class.
+  The user is currently in a class that is about to end, and has another one starting shortly after.
 
   Here are the details:
-  Current Class: {{#if currentClass}}Subject: {{{currentClass.subject}}}, Room: {{{currentClass.room}}}, End Time: {{{currentClass.endTime}}}{{else}}None{{/if}}
-  Next Class: {{#if nextClass}}Subject: {{{nextClass.subject}}}, Room: {{{nextClass.room}}}, Start Time: {{{nextClass.startTime}}}, End Time: {{{nextClass.endTime}}}{{else}}None{{/if}}
+  Current Class: Subject: {{{currentClass.subject}}}, Room: {{{currentClass.room}}}, End Time: {{{currentClass.endTime}}}
+  Next Class: Subject: {{{nextClass.subject}}}, Room: {{{nextClass.room}}}, Start Time: {{{nextClass.startTime}}}
   Is Consecutive: {{{isConsecutive}}}
 
-  If the classes are consecutive, provide a soft notification and a full-screen reminder with the subject, room, and time range of the next class. If not consecutive or no next class, do not override the normal alarm scheduling.
+  The notification is being triggered a few minutes before the current class ends.
+  
+  Based on this, you must generate a full-screen reminder. The message should be friendly and encouraging, telling the user to get ready for their next class. For example: "Time to pack up! Your next class is starting soon."
+  
+  Do not select 'soft_notification', 'alarm', or 'none'. You must use 'full_screen_reminder'.
 
   Return the notification type and a descriptive message.
 `,
