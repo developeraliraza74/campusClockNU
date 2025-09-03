@@ -1,3 +1,4 @@
+
 "use client";
 import { useEffect, useState } from 'react';
 import { useSchedule } from '@/hooks/use-schedule';
@@ -6,7 +7,9 @@ import { consecutiveClassNotification } from '@/ai/flows/consecutive-class-notif
 import { useToast } from '@/hooks/use-toast';
 import FullScreenReminder from './full-screen-reminder';
 import type { Class, Schedule } from '@/lib/types';
-import { parse, differenceInMinutes, add, format, getDay } from 'date-fns';
+import { parse, differenceInMinutes, add, format, getDay, isValid } from 'date-fns';
+import { convertTo24Hour } from '@/lib/utils';
+
 
 type ActiveReminder = {
   type: 'alarm' | 'consecutive';
@@ -40,15 +43,20 @@ export default function AlarmManager() {
         if (classInfo.isFreePeriod || !classInfo.alarmEnabled) continue;
         
         try {
-          const classStartTime = parse(classInfo.startTime, 'HH:mm', currentTime);
+          const startTime24 = convertTo24Hour(classInfo.startTime);
+          if(!startTime24) continue;
+          
+          const classStartTime = parse(startTime24, 'HH:mm', currentTime);
+
+          if(!isValid(classStartTime)) continue;
 
           // Standard alarm logic (11 to 10 minutes before)
           const minutesToClass = differenceInMinutes(classStartTime, currentTime);
-          if (minutesToClass > 9 && minutesToClass <= 11) {
-            const result = await reasoningAlarmScheduler({
+          if (minutesToClass >= 10 && minutesToClass < 11) {
+             const result = await reasoningAlarmScheduler({
               className: classInfo.subject,
               roomNumber: classInfo.roomNumber,
-              startTime: classInfo.startTime,
+              startTime: startTime24,
               currentTime: format(currentTime, 'HH:mm'),
             });
             if (result.shouldSetAlarm && result.alarmTime) {
@@ -56,26 +64,36 @@ export default function AlarmManager() {
               break; // Show first alarm and stop checking
             }
           }
-
+          
           // Consecutive class logic (2 minutes before end time of a consecutive class)
           if (classInfo.isConsecutive) {
-            const classEndTime = add(classStartTime, { minutes: parseInt(classInfo.duration.split(' ')[0]) || 50 });
+            const endTime24 = convertTo24Hour(classInfo.endTime);
+            if(!endTime24) continue;
+            
+            const classEndTime = parse(endTime24, 'HH:mm', currentTime);
+            if(!isValid(classEndTime)) continue;
+
             const minutesFromEnd = differenceInMinutes(currentTime, classEndTime);
             
             if (minutesFromEnd >= -2 && minutesFromEnd <= 0) {
               const nextClass = todayClasses.find((c, i) => i > index && !c.isFreePeriod);
               if (nextClass) {
-                const result = await consecutiveClassNotification({
-                  isConsecutive: true,
-                  currentClass: { subject: classInfo.subject, room: classInfo.roomNumber, endTime: format(classEndTime, 'p') },
-                  nextClass: { subject: nextClass.subject, room: nextClass.roomNumber, startTime: format(parse(nextClass.startTime, 'HH:mm', new Date()), 'p'), endTime: '' },
-                });
+                const nextStartTime = parse(nextClass.startTime, 'p', new Date());
+                const currentParsedEndTime = parse(classInfo.endTime, 'p', new Date());
 
-                if (result.notificationType === 'soft_notification') {
-                  toast({ title: 'Next Class', description: result.message });
-                } else if (result.notificationType === 'full_screen_reminder') {
-                  setActiveReminder({ type: 'consecutive', classInfo: nextClass, message: result.message });
-                  break; // Show reminder and stop
+                if(isValid(nextStartTime) && isValid(currentParsedEndTime)){
+                  const result = await consecutiveClassNotification({
+                    isConsecutive: true,
+                    currentClass: { subject: classInfo.subject, room: classInfo.roomNumber, endTime: format(currentParsedEndTime, 'p') },
+                    nextClass: { subject: nextClass.subject, room: nextClass.roomNumber, startTime: format(nextStartTime, 'p'), endTime: '' },
+                  });
+
+                  if (result.notificationType === 'soft_notification') {
+                    toast({ title: 'Next Class', description: result.message });
+                  } else if (result.notificationType === 'full_screen_reminder') {
+                    setActiveReminder({ type: 'consecutive', classInfo: nextClass, message: result.message });
+                    break; // Show reminder and stop
+                  }
                 }
               }
             }
