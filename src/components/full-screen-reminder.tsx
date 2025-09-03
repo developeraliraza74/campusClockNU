@@ -2,6 +2,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, Di
 import { Button } from '@/components/ui/button';
 import { AlarmClock, School, DoorOpen } from 'lucide-react';
 import type { Class } from '@/lib/types';
+import { useEffect, useRef } from 'react';
 
 type Reminder = {
   type: 'alarm' | 'consecutive';
@@ -15,6 +16,18 @@ type FullScreenReminderProps = {
 };
 
 export default function FullScreenReminder({ reminder, onDismiss }: FullScreenReminderProps) {
+  const audioRef = useRef<HTMLAudioElement>(null);
+
+  useEffect(() => {
+    // Attempt to play the audio when the component mounts
+    audioRef.current?.play().catch(error => {
+      // Autoplay is often blocked by browsers until a user interaction.
+      // This is expected, but we try anyway.
+      console.log("Audio autoplay prevented: ", error);
+    });
+  }, []);
+
+
   return (
     <Dialog open={true} onOpenChange={(open) => !open && onDismiss()}>
       <DialogContent className="sm:max-w-md w-full max-w-[90vw] h-full sm:h-auto flex flex-col justify-center text-center p-8 sm:rounded-lg">
@@ -42,6 +55,7 @@ export default function FullScreenReminder({ reminder, onDismiss }: FullScreenRe
         <DialogFooter>
           <Button size="lg" className="w-full" onClick={onDismiss}>Dismiss</Button>
         </DialogFooter>
+        <audio ref={audioRef} src="/alarm.mp3" loop />
       </DialogContent>
     </Dialog>
   );
