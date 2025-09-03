@@ -45,7 +45,7 @@ const prompt = ai.definePrompt({
   name: 'timetableOcrAnalysisPrompt',
   input: {schema: TimetableOcrAnalysisInputSchema},
   output: {schema: TimetableOcrAnalysisOutputSchema},
-  prompt: `You are an AI assistant that extracts timetable data from images. Given an image of a timetable, extract the schedule details, including subjects, room numbers, durations, start times, and days of the week.  The timetable may not be perfectly aligned, so you may need to reason about it.
+  prompt: `You are an AI assistant that extracts timetable data from images. The image may be blurry or of low quality. Do your best to extract the schedule details, including subjects, room numbers, durations, start times, and days of the week. The timetable may not be perfectly aligned, so you may need to reason about it.
 
 Timetable Image: {{media url=timetableImageDataUri}}
 
