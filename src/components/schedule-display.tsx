@@ -22,6 +22,7 @@ import {
 
 const getToday = (): DayOfWeek => {
   const dayIndex = new Date().getDay();
+  // Adjust because getDay() has Sunday as 0
   const days: DayOfWeek[] = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
   return days[dayIndex];
 }
@@ -35,7 +36,7 @@ export default function ScheduleDisplay() {
   }, []);
 
   if (!currentDay) {
-    return null;
+    return null; // or a loading skeleton
   }
 
   const handleTabChange = (value: string) => {
@@ -65,11 +66,13 @@ export default function ScheduleDisplay() {
         </AlertDialog>
       </div>
       <Tabs value={currentDay} onValueChange={handleTabChange} className="w-full">
-        <TabsList className="grid w-full grid-cols-3 md:grid-cols-4 lg:grid-cols-7">
-          {ALL_DAYS.map(day => (
-            <TabsTrigger key={day} value={day}>{day.substring(0,3)}</TabsTrigger>
-          ))}
-        </TabsList>
+        <div className="overflow-x-auto pb-2">
+          <TabsList className="grid w-full grid-cols-7">
+            {ALL_DAYS.map(day => (
+              <TabsTrigger key={day} value={day}>{day}</TabsTrigger>
+            ))}
+          </TabsList>
+        </div>
         {ALL_DAYS.map(day => (
           <TabsContent key={day} value={day} className="mt-6">
             {schedule[day] && schedule[day].length > 0 ? (

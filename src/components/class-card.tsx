@@ -3,7 +3,7 @@
 import { useState } from 'react';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { Clock, Home, Edit, Trash2, ArrowRight } from 'lucide-react';
+import { Clock, Home, Edit, Trash2, ArrowRight, Coffee } from 'lucide-react';
 import type { Class } from '@/lib/types';
 import EditClassSheet from './edit-class-sheet';
 import { useSchedule } from '@/hooks/use-schedule';
@@ -30,6 +30,25 @@ export default function ClassCard({ classInfo }: ClassCardProps) {
 
   const handleDelete = () => {
     deleteClass(classInfo.id, classInfo.dayOfWeek);
+  }
+
+  if (classInfo.isFreePeriod) {
+    return (
+       <Card className="flex flex-col bg-muted/50 border-dashed">
+        <CardHeader>
+          <CardTitle className="font-headline flex items-center justify-between">
+            <span className="break-words">Free Period</span>
+          </CardTitle>
+        </CardHeader>
+        <CardContent className="space-y-3 flex-grow flex flex-col justify-center items-center">
+            <Coffee className="h-8 w-8 text-muted-foreground mb-2" />
+            <div className="flex items-center text-muted-foreground">
+                <Clock className="mr-2 h-4 w-4" />
+                <span className="font-medium text-foreground">{classInfo.duration}</span>
+            </div>
+        </CardContent>
+      </Card>
+    );
   }
 
   return (

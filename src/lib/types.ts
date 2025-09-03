@@ -11,6 +11,7 @@ export interface Class {
   dayOfWeek: DayOfWeek;
   alarmEnabled: boolean;
   isConsecutive: boolean;
+  isFreePeriod?: boolean;
 }
 
 export type Schedule = Record<DayOfWeek, Class[]>;

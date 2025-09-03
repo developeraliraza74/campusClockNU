@@ -6,8 +6,6 @@ import { consecutiveClassNotification } from '@/ai/flows/consecutive-class-notif
 import { useToast } from '@/hooks/use-toast';
 import FullScreenReminder from './full-screen-reminder';
 import type { Class, Schedule } from '@/lib/types';
-import { Switch } from './ui/switch';
-import { Label } from './ui/label';
 import { parse, differenceInMinutes, add, format, getDay } from 'date-fns';
 
 type ActiveReminder = {
@@ -20,7 +18,6 @@ export default function AlarmManager() {
   const { schedule } = useSchedule();
   const [activeReminder, setActiveReminder] = useState<ActiveReminder | null>(null);
   const { toast } = useToast();
-  const [isInsideClass, setIsInsideClass] = useState(false);
   const [currentTime, setCurrentTime] = useState<Date | null>(null);
 
   useEffect(() => {
@@ -40,7 +37,7 @@ export default function AlarmManager() {
       const todayClasses = schedule[dayOfWeek as keyof Schedule] || [];
 
       for (const [index, classInfo] of todayClasses.entries()) {
-        if (!classInfo.alarmEnabled) continue;
+        if (classInfo.isFreePeriod || !classInfo.alarmEnabled) continue;
         
         try {
           const classStartTime = parse(classInfo.startTime, 'HH:mm', currentTime);
@@ -53,7 +50,6 @@ export default function AlarmManager() {
               roomNumber: classInfo.roomNumber,
               startTime: classInfo.startTime,
               currentTime: format(currentTime, 'HH:mm'),
-              currentLocation: isInsideClass ? 'InsideClass' : 'NotInsideClass',
             });
             if (result.shouldSetAlarm && result.alarmTime) {
               setActiveReminder({ type: 'alarm', classInfo, message: result.reason });
@@ -67,7 +63,7 @@ export default function AlarmManager() {
             const minutesFromEnd = differenceInMinutes(currentTime, classEndTime);
             
             if (minutesFromEnd >= -2 && minutesFromEnd <= 0) {
-              const nextClass = todayClasses[index + 1];
+              const nextClass = todayClasses.find((c, i) => i > index && !c.isFreePeriod);
               if (nextClass) {
                 const result = await consecutiveClassNotification({
                   isConsecutive: true,
@@ -93,14 +89,10 @@ export default function AlarmManager() {
     
     checkAlarms();
   // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [currentTime, schedule, isInsideClass]);
+  }, [currentTime, schedule]);
 
   return (
     <>
-      <div className="fixed bottom-4 right-4 bg-card p-3 rounded-lg border shadow-lg flex items-center space-x-2 z-50">
-        <Switch id="location-mode" checked={isInsideClass} onCheckedChange={setIsInsideClass} />
-        <Label htmlFor="location-mode" className="text-sm font-medium">In a classroom</Label>
-      </div>
       {activeReminder && (
         <FullScreenReminder
           reminder={activeReminder}
