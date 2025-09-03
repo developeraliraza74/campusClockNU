@@ -1,3 +1,4 @@
+
 'use server';
 
 /**
@@ -15,7 +16,7 @@ const TimetableOcrAnalysisInputSchema = z.object({
   timetableImageDataUri: z
     .string()
     .describe(
-      'A photo of a timetable, as a data URI that must include a MIME type and use Base64 encoding. Expected format: \'data:<mimetype>;base64,<encoded_data>\'.' // correct the typo here
+      "A photo of a timetable, as a data URI that must include a MIME type and use Base64 encoding. Expected format: 'data:<mimetype>;base64,<encoded_data>'."
     ),
 });
 export type TimetableOcrAnalysisInput = z.infer<typeof TimetableOcrAnalysisInputSchema>;
@@ -26,8 +27,8 @@ const TimetableOcrAnalysisOutputSchema = z.object({
       z.object({
         subject: z.string().describe('The name of the subject.'),
         roomNumber: z.string().describe('The room number where the class is held.'),
-        duration: z.string().describe('The duration of the class (e.g., 1 hour, 1.5 hours).'),
-        startTime: z.string().describe('The starting time of the class (e.g., 9:00 AM).'),
+        startTime: z.string().describe('The starting time of the class in 12-hour format (e.g., 9:00 AM).'),
+        endTime: z.string().describe('The ending time of the class in 12-hour format (e.g., 10:30 AM).'),
         dayOfWeek: z.string().describe('The day of the week for the class (e.g., Monday, Tuesday).'),
       })
     )
@@ -45,7 +46,7 @@ const prompt = ai.definePrompt({
   name: 'timetableOcrAnalysisPrompt',
   input: {schema: TimetableOcrAnalysisInputSchema},
   output: {schema: TimetableOcrAnalysisOutputSchema},
-  prompt: `You are an AI assistant that extracts timetable data from images. The image may be blurry or of low quality. Do your best to extract the schedule details, including subjects, room numbers, durations, start times, and days of the week. The timetable may not be perfectly aligned, so you may need to reason about it.
+  prompt: `You are an AI assistant that extracts timetable data from images. The image may be blurry or of low quality. Do your best to extract the schedule details, including subjects, room numbers, start times, end times, and days of the week. The timetable may not be perfectly aligned, so you may need to reason about it. Ensure all times are in a 12-hour format (e.g., 9:00 AM, 1:30 PM).
 
 Timetable Image: {{media url=timetableImageDataUri}}
 

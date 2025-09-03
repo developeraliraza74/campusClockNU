@@ -1,3 +1,4 @@
+
 "use client";
 
 import { useForm } from 'react-hook-form';
@@ -17,8 +18,8 @@ import { useEffect } from 'react';
 const classSchema = z.object({
   subject: z.string().min(1, "Subject is required."),
   roomNumber: z.string().min(1, "Room number is required."),
-  startTime: z.string().regex(/^([01]?[0-9]|2[0-3]):[0-5][0-9]$/, "Invalid time format (HH:MM 24-hour)."),
-  duration: z.string().min(1, "Duration is required."),
+  startTime: z.string().regex(/^(0?[1-9]|1[0-2]):[0-5][0-9] (AM|PM)$/i, "Invalid time format (e.g., 9:00 AM)."),
+  endTime: z.string().regex(/^(0?[1-9]|1[0-2]):[0-5][0-9] (AM|PM)$/i, "Invalid time format (e.g., 10:30 AM)."),
   dayOfWeek: z.enum(ALL_DAYS),
 });
 
@@ -38,7 +39,7 @@ export default function EditClassSheet({ open, onOpenChange, classInfo }: EditCl
       subject: classInfo.subject,
       roomNumber: classInfo.roomNumber,
       startTime: classInfo.startTime,
-      duration: classInfo.duration,
+      endTime: classInfo.endTime,
       dayOfWeek: classInfo.dayOfWeek,
     },
   });
@@ -49,7 +50,7 @@ export default function EditClassSheet({ open, onOpenChange, classInfo }: EditCl
       subject: classInfo.subject,
       roomNumber: classInfo.roomNumber,
       startTime: classInfo.startTime,
-      duration: classInfo.duration,
+      endTime: classInfo.endTime,
       dayOfWeek: classInfo.dayOfWeek,
     });
   }, [classInfo, form]);
@@ -85,15 +86,15 @@ export default function EditClassSheet({ open, onOpenChange, classInfo }: EditCl
             )} />
             <FormField control={form.control} name="startTime" render={({ field }) => (
               <FormItem>
-                <FormLabel>Start Time (24-hour)</FormLabel>
-                <FormControl><Input {...field} placeholder="e.g., 09:00 or 14:30" /></FormControl>
+                <FormLabel>Start Time</FormLabel>
+                <FormControl><Input {...field} placeholder="e.g., 9:00 AM" /></FormControl>
                 <FormMessage />
               </FormItem>
             )} />
-            <FormField control={form.control} name="duration" render={({ field }) => (
+             <FormField control={form.control} name="endTime" render={({ field }) => (
               <FormItem>
-                <FormLabel>Duration</FormLabel>
-                <FormControl><Input {...field} placeholder="e.g., 50 minutes" /></FormControl>
+                <FormLabel>End Time</FormLabel>
+                <FormControl><Input {...field} placeholder="e.g., 10:30 AM" /></FormControl>
                 <FormMessage />
               </FormItem>
             )} />

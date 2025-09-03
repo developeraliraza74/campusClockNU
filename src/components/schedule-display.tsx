@@ -1,3 +1,4 @@
+
 "use client"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { useSchedule } from '@/hooks/use-schedule';
@@ -32,15 +33,26 @@ export default function ScheduleDisplay() {
   const [currentDay, setCurrentDay] = useState<DayOfWeek | null>(null);
 
   useEffect(() => {
+    // This effect should only run once on the client side
     setCurrentDay(getToday());
   }, []);
 
-  if (!currentDay) {
-    return null; // or a loading skeleton
-  }
-
   const handleTabChange = (value: string) => {
     setCurrentDay(value as DayOfWeek);
+  }
+  
+  const today = getToday();
+  const initialTab = schedule[today]?.length > 0 ? today : (ALL_DAYS.find(d => schedule[d]?.length > 0) || today);
+
+  useEffect(() => {
+    if(!currentDay) {
+      setCurrentDay(initialTab);
+    }
+  }, [schedule, currentDay, initialTab]);
+
+
+  if (!currentDay) {
+    return null; // or a loading skeleton
   }
 
   return (
@@ -67,11 +79,11 @@ export default function ScheduleDisplay() {
       </div>
       <Tabs value={currentDay} onValueChange={handleTabChange} className="w-full">
         <div className="overflow-x-auto pb-2">
-          <TabsList className="grid w-full grid-cols-7">
-            {ALL_DAYS.map(day => (
-              <TabsTrigger key={day} value={day}>{day}</TabsTrigger>
-            ))}
-          </TabsList>
+            <TabsList className="grid w-full sm:w-auto grid-cols-1 sm:grid-cols-7 h-auto sm:h-10">
+              {ALL_DAYS.map(day => (
+                <TabsTrigger key={day} value={day} className="sm:w-auto w-full">{day.substring(0,3)}</TabsTrigger>
+              ))}
+            </TabsList>
         </div>
         {ALL_DAYS.map(day => (
           <TabsContent key={day} value={day} className="mt-6">

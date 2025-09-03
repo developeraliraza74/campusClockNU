@@ -1,3 +1,4 @@
+
 "use client";
 
 import { useState } from 'react';
@@ -38,13 +39,14 @@ export default function ClassCard({ classInfo }: ClassCardProps) {
         <CardHeader>
           <CardTitle className="font-headline flex items-center justify-between">
             <span className="break-words">Free Period</span>
+             <Coffee className="h-5 w-5 text-muted-foreground" />
           </CardTitle>
+          <CardDescription>{classInfo.duration}</CardDescription>
         </CardHeader>
-        <CardContent className="space-y-3 flex-grow flex flex-col justify-center items-center">
-            <Coffee className="h-8 w-8 text-muted-foreground mb-2" />
+        <CardContent className="space-y-3 flex-grow flex flex-col justify-center">
             <div className="flex items-center text-muted-foreground">
                 <Clock className="mr-2 h-4 w-4" />
-                <span className="font-medium text-foreground">{classInfo.duration}</span>
+                <span className="font-medium text-foreground">{classInfo.startTime} &mdash; {classInfo.endTime}</span>
             </div>
         </CardContent>
       </Card>
@@ -93,8 +95,7 @@ export default function ClassCard({ classInfo }: ClassCardProps) {
         <CardContent className="space-y-3 flex-grow">
           <div className="flex items-center text-muted-foreground">
             <Clock className="mr-2 h-4 w-4" />
-            <span className="font-medium text-foreground">{classInfo.startTime}</span>
-            <span className="ml-1">({classInfo.duration})</span>
+            <span className="font-medium text-foreground">{classInfo.startTime} &mdash; {classInfo.endTime}</span>
           </div>
           <div className="flex items-center text-muted-foreground">
             <Home className="mr-2 h-4 w-4" />
