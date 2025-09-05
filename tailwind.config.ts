@@ -11,7 +11,7 @@ export default {
     extend: {
       fontFamily: {
         body: ['Sora', 'sans-serif'],
-        headline: ['Clash Display', 'sans-serif'],
+        headline: ['Inter', 'sans-serif'],
         code: ['monospace'],
       },
       colors: {
