@@ -1,5 +1,5 @@
 import { Button } from "@/components/ui/button";
-import { UploadCloud, BookOpenCheck, Info } from "lucide-react";
+import { UploadCloud, BookOpenCheck } from "lucide-react";
 import { ThemeSwitcher } from "./theme-switcher";
 import Link from "next/link";
 
@@ -20,12 +20,6 @@ export default function Header({ onUploadClick }: HeaderProps) {
             <UploadCloud className="mr-0 sm:mr-2 h-4 w-4" />
             <span className="hidden sm:inline">Upload</span>
           </Button>
-          <Link href="/about" passHref>
-             <Button variant="outline" size="icon">
-                <Info className="h-4 w-4" />
-                <span className="sr-only">About</span>
-            </Button>
-          </Link>
           <ThemeSwitcher />
         </div>
       </div>
