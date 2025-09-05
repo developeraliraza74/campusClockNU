@@ -20,6 +20,7 @@ import {
   AlertDialogTitle,
   AlertDialogTrigger,
 } from "@/components/ui/alert-dialog"
+import { ScrollArea, ScrollBar } from './ui/scroll-area';
 
 const getToday = (): DayOfWeek => {
   const dayIndex = new Date().getDay();
@@ -78,17 +79,18 @@ export default function ScheduleDisplay() {
         </AlertDialog>
       </div>
       <Tabs value={currentDay} onValueChange={handleTabChange} className="w-full">
-        <div className="overflow-x-auto pb-2">
-            <TabsList className="grid w-full sm:w-auto grid-cols-1 sm:grid-cols-7 h-auto sm:h-10">
-              {ALL_DAYS.map(day => (
-                <TabsTrigger key={day} value={day} className="sm:w-auto w-full">{day.substring(0,3)}</TabsTrigger>
-              ))}
-            </TabsList>
-        </div>
+        <ScrollArea className="w-full whitespace-nowrap">
+          <TabsList>
+            {ALL_DAYS.map(day => (
+              <TabsTrigger key={day} value={day}>{day}</TabsTrigger>
+            ))}
+          </TabsList>
+          <ScrollBar orientation="horizontal" />
+        </ScrollArea>
         {ALL_DAYS.map(day => (
           <TabsContent key={day} value={day} className="mt-6">
             {schedule[day] && schedule[day].length > 0 ? (
-              <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
+              <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
                 {schedule[day].map(classInfo => (
                   <ClassCard key={classInfo.id} classInfo={classInfo} />
                 ))}

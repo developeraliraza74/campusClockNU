@@ -3,6 +3,7 @@ import { Linkedin, Instagram, Github } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import Header from '@/components/header';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import Link from 'next/link';
 
 export default function AboutPage() {
   return (
