@@ -12,6 +12,7 @@ export default {
       fontFamily: {
         body: ['Sora', 'sans-serif'],
         headline: ['Inter', 'sans-serif'],
+        cursive: ['Marienda', 'cursive'],
         code: ['monospace'],
       },
       colors: {
