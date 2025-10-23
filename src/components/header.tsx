@@ -10,7 +10,7 @@ type HeaderProps = {
 export default function Header({ onUploadClick }: HeaderProps) {
   return (
     <header className="sticky top-0 z-40 w-full border-b bg-background/95 backdrop-blur-sm">
-      <div className="container flex h-16 items-center justify-between px-4">
+      <div className="container flex h-16 items-center justify-between px-4 sm:px-6">
         <Link href="/" className="flex items-center gap-2">
           <BookOpenCheck className="h-7 w-7 text-primary" />
           <h1 className="font-headline text-xl sm:text-2xl font-bold">CampusClock</h1>
